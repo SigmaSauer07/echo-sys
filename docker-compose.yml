@@ -1,0 +1,350 @@
+# docker-compose.yml
+
+services:
+  # ===== MCP Backend (Main Control Plane) =====
+  mcp:
+    build:
+      context: .
+      dockerfile: backend/mcp/Dockerfile
+    container_name: alsaniamcp-mcp
+    ports:
+      - "8050:8050"
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - ./backend:/app
+      - echo_logs:/app/logs
+      - echo_state:/app/state
+    networks:
+      - alsania-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8050/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ===== MCP API (Backend Core API) =====
+  backend:
+    build:
+      context: .
+      dockerfile: backend/api/Dockerfile
+    container_name: alsaniamcp-backend
+    ports:
+      - "8051:8051"
+    env_file:
+      - .env
+    depends_on:
+      mcp:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - echo_logs:/app/logs
+      - echo_state:/app/state
+    networks:
+      - alsania-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8051/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ===== Frontend =====
+  frontend:
+    image: nginx:alpine
+    container_name: alsaniamcp-frontend
+    ports:
+      - "8080:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - alsania-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  # ===== Echo-Core Central AI ======
+  echo-core:
+    build:
+      context: .
+      dockerfile: echo_core/Dockerfile
+    container_name: alsaniamcp-echo-core
+    ports:
+      - "8060:8060"
+    env_file:
+      - .env
+    depends_on:
+      backend:
+        condition: service_healthy
+    volumes:
+      - ./echo_core:/app
+      - echo_memory:/app/memory
+      - echo_state:/app/state
+      - echo_logs:/app/logs
+      - echo_learning:/app/learning
+    networks:
+      - alsania-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8060/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  # ===== Agents =====
+  echo-agent-cypher:
+    build:
+      context: .
+      dockerfile: infra/docker/echo-agent.Dockerfile
+    container_name: alsaniamcp-agent-cypher
+    env_file:
+      - .env
+    ports:
+      - "9001:9000"
+    depends_on:
+      echo-core:
+        condition: service_healthy
+    volumes:
+      - ./backend/agents:/app/agents
+      - cypher_workspace:/app/workspace
+      - cypher_logs:/app/logs
+    networks:
+      - alsania-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9001/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  echo-agent-scribe:
+    build:
+      context: .
+      dockerfile: infra/docker/echo-agent.Dockerfile
+    container_name: alsaniamcp-agent-scribe
+    env_file:
+      - .env
+    ports:
+      - "9002:9000"
+    depends_on:
+      echo-core:
+        condition: service_healthy
+    volumes:
+      - ./backend/agents:/app/agents
+      - scribe_workspace:/app/workspace
+      - scribe_logs:/app/logs
+    networks:
+      - alsania-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9002/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  echo-agent-sentinel:
+    build:
+      context: .
+      dockerfile: infra/docker/echo-agent.Dockerfile
+    container_name: alsaniamcp-agent-sentinel
+    env_file:
+      - .env
+    ports:
+      - "9003:9000"
+    depends_on:
+      echo-core:
+        condition: service_healthy
+    volumes:
+      - ./backend/agents:/app/agents
+      - sentinel_workspace:/app/workspace
+      - sentinel_logs:/app/logs
+    networks:
+      - alsania-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9003/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  # ===== Telemetry =====
+  telemetry:
+    build:
+      context: .
+      dockerfile: infra/docker/telemetry.Dockerfile
+    container_name: alsaniamcp-telemetry
+    ports:
+      - "8070:8070"
+    env_file:
+      - .env
+    volumes:
+      - telemetry_logs:/app/logs
+      - telemetry_data:/app/data
+      - telemetry_metrics:/app/metrics
+    networks:
+      - alsania-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8070/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  # ===== Snapshot Manager =====
+  snapshot-manager:
+    build:
+      context: .
+      dockerfile: snapshot_manager/Dockerfile
+    container_name: alsaniamcp-snapshot-manager
+    ports:
+      - "8100:8100"
+    env_file:
+      - .env
+    volumes:
+      - ./snapshot_manager:/app
+      - snapshot_storage:/app/snapshots
+      - backup_storage:/app/backups
+      - snapshot_logs:/app/logs
+      - recovery_data:/app/recovery
+    networks:
+      - alsania-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8100/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  # ===== Agent Registry =====
+  agent-registry:
+    build:
+      context: .
+      dockerfile: infra/docker/agent-registry.Dockerfile
+    container_name: alsaniamcp-agent-registry
+    ports:
+      - "8090:8090"
+    env_file:
+      - .env
+    volumes:
+      - agent_registry_data:/app/data
+      - agent_templates:/app/templates
+    networks:
+      - alsania-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8090/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  # ===== Core Infrastructure =====
+  postgres:
+    image: postgres:16-alpine
+    container_name: alsaniamcp-postgres
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - alsania-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  qdrant:
+    image: qdrant/qdrant:v1.7.4
+    container_name: alsaniamcp-qdrant
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_storage:/qdrant/storage
+    networks:
+      - alsania-network
+    healthcheck:
+      test: ["CMD", "bash", "-c", "</dev/tcp/localhost/6333"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: alsaniamcp-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - alsania-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: alsaniamcp-ollama
+    ports:
+      - "11435:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    networks:
+      - alsania-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:11434/api/version || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 8
+      start_period: 60s
+
+# ===== VOLUMES =====
+volumes:
+  alsaniamcp_qdrant_storage:
+  alsaniamcp_redis_data:
+  alsaniamcp_logs:
+  alsaniamcp_state:
+  postgres_data:
+  qdrant_storage:
+  redis_data:
+  ollama_models:
+  echo_memory:
+  echo_state:
+  echo_logs:
+  echo_learning:
+  cypher_workspace:
+  cypher_logs:
+  scribe_workspace:
+  scribe_logs:
+  sentinel_workspace:
+  sentinel_logs:
+  telemetry_logs:
+  telemetry_data:
+  telemetry_metrics:
+  activity_logs:
+  snapshot_storage:
+  backup_storage:
+  snapshot_logs:
+  recovery_data:
+  agent_registry_data:
+  agent_templates:
+
+# ===== NETWORKS =====
+networks:
+  alsania-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+    labels:
+      - "com.alsania.network=ecosystem"
+      - "com.alsania.environment=production"
+      - "com.alsania.echo-core=enabled"
+      - "com.alsania.agents=isolated"

@@ -1,0 +1,6 @@
+# core/auth/hybrid_rules.yaml
+echo-001:
+  access: "hmac"
+  ip_whitelist: ["10.0.0.0/8"]
+local_agents:
+  access: "jwt"

@@ -1,0 +1,97 @@
+{
+  "mcpServers": [
+    {
+      "name": "alsaniamcp",
+      "url": "http://localhost:8050",
+      "provider": "alsania",
+      "requestOptions": {
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer not_needed"
+        },
+        "timeout": 7200
+      }
+    }
+  ],
+  "models": [
+    {
+      "title": "Echo-001",
+      "provider": "alsania",
+      "model": "echo-001",
+      "mcpServer": "alsaniamcp",
+      "persona": "You are Echo.",
+      "memory_namespace": "echo-001",
+      "maxTokens": 30000,
+      "temperature": 0.7,
+      "topP": 1,
+      "frequencyPenalty": 0,
+      "presencePenalty": 0,
+      "stopSequences": [],
+      "logitBias": {},
+      "requestOptions": {
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer not_needed"
+        },
+        "timeout": 30000
+      }
+    }
+  ],
+  "defaultModel": "echo-001",
+  "contextProviders": [
+    {
+      "name": "Echo-001",
+      "params": {
+        "title": "Echo-001 Context",
+        "description": "Get context from AlsaniaMCP backend",
+        "displayTitle": "Echo-001"
+      }
+    },
+    {
+      "name": "file"
+    },
+    {
+      "name": "codebase"
+    },
+    {
+      "name": "diff"
+    }
+  ],
+  "rules": [
+    "You are Echo-001, a helpful AI assistant connected to the AlsaniaMCP backend.",
+    "Always provide clear and concise responses.",
+    "When asked about your capabilities, mention that you're connected to the EchoMCP backend running on localhost:8050.",
+    "Use the EchoMCP backend for all chat interactions and context retrieval.",
+    "Always follow the alsania-rules.md rules.",
+    "Always follow the alsania-code-of-conduct.md code of conduct."
+  ],
+  "ui": {
+    "theme": "dark"
+  },
+  "codingAssistant": {
+    "provider": "mistral",
+    "apiBase": "https://api.mistral.ai/v1",
+    "model": "mamba-codestral-7b-v0.1-instruct-python_coding_assistant",
+    "temperature": 0.7,
+    "stream": false
+  },
+  "agent": {
+    "provider": "openai",
+    "apiBase": "https://api.openai.com/v1",
+    "model": "gpt-3.5-turbo-0613",
+    "temperature": 0.7,
+    "stream": false
+  },
+  "extensions": [
+    {
+      "name": "Echo-Devcon",
+      "path": "~/Desktop/AlsaniaProjects/echo-devcon/extension/extension.js"
+    }
+  ],
+  "plugins": [
+    {
+      "name": "Echo-Devcon",
+      "path": "~/Desktop/AlsaniaProjects/echo-devcon/extension/extension.js"
+    }
+  ]
+}

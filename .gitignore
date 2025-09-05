@@ -1,0 +1,138 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Environment and Secrets
+# Critical for security - never commit sensitive data:
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.staging
+
+# Virtual environments
+.venv
+venv/
+ENV/
+env/
+
+# IDE and Editor Files
+# Common across development environments:
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# PyCharm / IntelliJ
+.idea/
+
+# Other editors
+*.swp
+*.swo
+*~
+
+# OS-Specific Files
+# Platform-generated files that vary by OS:
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Linux
+*~
+
+# Logs and Temporary Files
+# Your project has forensics logs and other temporary data:
+
+# Logs
+*.log
+logs/
+backend/core/memory/forensics/forensics.log
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+
+# Cache and Generated Data
+# Your project uses embeddings cache and other generated files:
+
+# Embedding caches (Python pickle files)
+backend/core/cache/embeddings/*.pkl
+backend/core/embeddings/cache/embeddings/*.pkl
+
+# Other caches
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis
+
+# Backup and Config Files
+# Some files in your project appear to be backups:
+
+# Backup files
+*.bak
+config/*.bak
+backend/core/config/*.bak
+
+# Docker and Infrastructure
+# If using Docker for development/deployment:
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+# Note: Keep docker-compose.yml tracked for reproducibility
+
+# Build and Dependency Artifacts
+# Node.js (if frontend uses npm/yarn)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Package directories
+.pnpm-debug.log*
+
+Project-Specific Ignores
+Based on your directory structure:
+
+# Project-specific caches and data
+.qodo/
+.zencoder/
+snapshot_manager/backups/
+backend/tests/chaos/

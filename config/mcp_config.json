@@ -1,0 +1,175 @@
+{
+  "mcpServers": {
+    "alsaniamcp": {
+      "name": "alsaniamcp",
+      "url": "http://localhost:8050",
+      "provider": "alsania",
+      "requestOptions": {
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer not_needed"
+        }
+      }
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "@modelcontextprotocol/server-filesystem",
+        "/home/sigma/Desktop/echo-lab"
+      ],
+      "type": "stdio"
+    },
+    "vscode": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "vscode-mcp-server@latest",
+        "--cacheDir",
+        "/home/sigma/.vscode-as-mcp-relay-cache"
+      ],
+      "type": "stdio"
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-memory"],
+      "type": "stdio"
+    },
+    "markitdown": {
+      "command": "uvx",
+      "args": ["markitdown-mcp"],
+      "type": "stdio"
+    },
+    "codacy": {
+      "command": "npx",
+      "args": ["-y", "@codacy/codacy-mcp@latest"],
+      "env": {
+        "CODACY_ACCOUNT_TOKEN": "UHWmca0O5cIBYKjB4Cbe"
+      },
+      "type": "stdio"
+    },
+    "imagesorcery": {
+      "command": "uvx",
+      "args": ["imagesorcery-mcp"],
+      "type": "stdio"
+    },
+    "git": {
+      "command": "uvx",
+      "args": ["mcp-server-git", "--repository", "/path/to/repo"],
+      "type": "stdio"
+    },
+    "mem-mcp": {
+      "url": "http://localhost:2222/mcp",
+      "type": "streaming-http"
+    },
+    "everything": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-everything"],
+      "type": "stdio"
+    },
+    "it-tools": {
+      "command": "npx",
+      "args": ["it-tools-mcp"],
+      "type": "stdio"
+    },
+    "huggingface": {
+      "type": "stdio",
+      "url": "https://hf.co/mcp",
+      "gallery": true
+    },
+    "convex": {
+      "command": "npx",
+      "args": ["-y", "convex@latest", "mcp", "start"],
+      "type": "stdio"
+    },
+    "sequentialthinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "type": "stdio"
+    },
+    "linear": {
+      "url": "https://mcp.linear.app/sse",
+      "type": "stdio"
+    },
+    "github": {
+      "type": "stdio",
+      "url": "https://api.githubcopilot.com/mcp/"
+    },
+    "redis": {
+      "command": "uvx",
+      "args": ["mcp-server-redis", "--url", "http://127.0.0.1:6379"],
+      "type": "stdio"
+    },
+    "qdrant": {
+      "command": "uvx",
+      "args": ["mcp-server-qdrant"],
+      "env": {
+        "QDRANT_URL": "http://127.0.0.1:6333",
+        "QDRANT_API_KEY": "none",
+        "COLLECTION_NAME": "e_sys_memory",
+        "EMBEDDING_MODEL": "sentence-transformers/all-MiniLM-L6-v2"
+      },
+      "type": "stdio"
+    },
+    "postgrest": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-postgrest@latest",
+        "--apiUrl",
+        "http://127.0.0.1:5432",
+        "--apiKey",
+        "",
+        "--schema",
+        "public"
+      ],
+      "type": "stdio"
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@latest",
+        "--browser=chrome",
+        "--headless=",
+        "--viewport-size="
+      ],
+      "type": "stdio"
+    },
+    "slack": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-slack"],
+      "env": {
+        "SLACK_BOT_TOKEN": "xoxb-9408484691204-9438594162354-8VHjtOlCCLT3xZouScX9iWgf",
+        "SLACK_TEAM_ID": "T09C0E8LB60",
+        "SLACK_CHANNEL_IDS": "C09C0E8QK3N"
+      },
+      "type": "stdio"
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"],
+      "env": {
+        "DEFAULT_MINIMUM_TOKENS": ""
+      },
+      "type": "stdio"
+    }
+  },
+  "mcpRelays": {
+    "redis": {
+      "command": "uvx",
+      "args": ["mcp-server-redis", "--url", "http://127.0.0.1:6379"],
+      "type": "stdio"
+    },
+    "qdrant": {
+      "command": "uvx",
+      "args": ["mcp-server-qdrant"],
+      "env": {
+        "QDRANT_URL": "http://127.0.0.1:6333",
+        "QDRANT_API_KEY": "",
+        "COLLECTION_NAME": "e_sys_memory",
+        "EMBEDDING_MODEL": "sentence-transformers/all-MiniLM-L6-v2"
+      },
+      "type": "stdio"
+    }
+  }
+}

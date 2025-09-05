@@ -1,0 +1,89 @@
+Todays AI is based on a hybrid, modular system. This means that the system has a central core server and can spawn lightweight, independent satellite servers.
+
+This project is an extensible, microservices-based platform for hosting and managing AI agents. Its primary purpose is to provide a structured environment where different AI agents can collaborate, use a shared set of tools, and be accessed through a unified API. The "MCP" (Model Context Protocol) appears to be its custom framework for how AI models, their context, and tools interact.
+
+Here’s a more detailed breakdown of its specific features and how they work together:
+
+1. Core Architecture: A Hybrid, Modular System
+The system is "hybrid" because it has a central Core Server and can spawn lightweight, independent Satellite Servers.
+
+Core Server: This is the main hub. It manages all the agents, a global set of tools, and system-wide configurations. It's the main entry point for most interactions.
+Satellite Servers: These are custom, on-demand servers you can create via an API call (/spawn_satellite). You can specify which tools and API keys a satellite should have. This is useful for creating isolated environments for specific tasks, users, or applications (like a dedicated agent for a VS Code extension).
+The entire system is built on a Plugin-Based Architecture. This means its core functionalities, like agents, memory systems, and embedding models, are designed as interchangeable modules. This makes it highly extensible, allowing developers to:
+
+Add New Agents: By creating a new agent module in the backend/agents/ directory.
+Add New Tools: By defining a Python function and registering it.
+Swap Core Components: The architecture is designed to allow swapping out the underlying models or databases (e.g., using a different vector store instead of Qdrant).
+2. How It Works: The Journey of a Request
+The docker-compose.yml file clearly shows how the different microservices interact. Let's trace a typical chat request:
+
+Frontend/Client: A user sends a message from the web interface (or via a curl command) to the Backend API service (running on port 8050).
+Backend API (backend): This FastAPI service is the main gateway. It receives the request, authenticates it, and determines where to route it. For a chat request, it might consult the MCP service.
+MCP (mcp): The "Master Control Plane" acts as a router or orchestrator. It decides which agent is best suited to handle the request.
+Echo Core (echo-core): This is the central intelligence. The request is passed here for processing. echo-core likely interacts with:
+Ollama: To access a locally running Large Language Model for generating responses.
+Qdrant: To retrieve relevant information from its long-term vector memory. This allows the agent to recall past conversations or documents.
+PostgreSQL/Redis: For accessing structured data or cached information.
+Agent (echo-agent-*): The selected agent (e.g., scribe or cypher) receives the context from Echo Core and formulates a specific response based on its specialized training and purpose.
+Response: The final response travels back through the chain to the user.
+3. The Components and Their Specific Roles
+main.py / backend: The main FastAPI application that exposes the API endpoints listed in the README, such as /chat, /tools, and /spawn_satellite.
+echo-core: The "brain." It manages the AI's state, learning, and memory. The memory/vector_store directory suggests it's responsible for creating and managing the embeddings stored in the Qdrant database.
+agents/: This directory holds the different AI personalities or specialists.
+cypher: The name suggests an agent focused on code, encryption, or data analysis.
+scribe: Likely an agent specialized in generating documentation, reports, or other text-based content.
+sentinel: Suggests a monitoring or security-focused agent that observes the system.
+qdrant (Vector Database): This is crucial for the AI's memory. It stores text and other data as mathematical vectors, allowing the AI to perform "semantic search" to find contextually relevant information instead of just matching keywords.
+ollama (Local LLM Runner): This service allows the system to run powerful language models directly on the local machine, avoiding reliance on external APIs like OpenAI or Google. This increases privacy and allows for fine-tuning models for specific tasks.
+snapshot_manager: A critical service for reliability. It periodically saves the state of the entire system, including agent memory and configurations, allowing for backups and recovery.
+This project is a robust and well-architected platform for creating a multi-agent AI ecosystem. It's designed for both power and flexibility, allowing developers to easily extend its capabilities while maintaining a clear separation between its different components.
+
+“What subsystems or modules are currently active, and which are disabled or incomplete?”
+
+Based on the documentation and service definitions, I can determine the status of the various subsystems.
+
+Disabled or Incomplete Modules
+The MODULAR_ARCHITECTURE_SUMMARY.md document indicates that while the core plugin infrastructure is complete, several modules have not yet been fully refactored to use it. The following are listed as "Remaining Implementation Tasks":
+
+Modular Agent System: The existing agents (cypher, scribe, sentinel) are functional but still need to be refactored to fully adopt the new plugin architecture.
+Modular Embeddings System: A pluggable system for different embedding backends is planned but not yet implemented.
+Modular Memory System: The memory components are also slated to be refactored into plugins.
+In short, the foundational framework is active, but the work to migrate all the components to be fully modular plugins is incomplete
+
+“What events or changes have been logged recently that I should know about?”
+
+“What milestones have been reached since the last checkpoint?”
+
+“Where are logs or outputs currently being stored?”
+
+Gemini
+Thinking
+stat_minus_1
+Of course. I will answer your questions by consulting the project's change logs, milestone summaries, and configuration files.
+
+Recent Events and Changes
+To find recent changes, I'll check the changes.md file.
+
+check
+ReadFile...ystem/changes.md
+The changes.md file is empty. For the most detailed history, you would need to consult the git log.
+
+Milestones Since Last Checkpoint
+The docs/architecture/MODULAR_ARCHITECTURE_SUMMARY.md file serves as a detailed milestone report. The key achievements reached recently are:
+
+Completion of Plugin-Based Architecture: The foundational work to make the system modular is finished. This includes a core plugin system, a dependency injection container for loose coupling, and an event system for communication between components.
+Modular Code Organization: The project structure has been cleaned up, and clear boundaries between different modules have been established.
+Comprehensive Testing Infrastructure: A full suite of unit, integration, and Docker-based tests has been implemented, including a test runner script (scripts/run_tests.py).
+System Validation: The core systems have been validated. All services build successfully in Docker, all Python imports resolve correctly, and the plugin infrastructure has been tested.
+Log Storage Locations
+The docker-compose.yml file defines where each service's logs are stored. They are mapped from paths inside the Docker containers to named volumes on the host machine. Here is a summary:
+
+Service	Host Log Volume	Path Inside Container
+mcp	echo_logs	/app/logs
+backend	echo_logs	/app/logs
+echo-core	echo_logs	/app/logs
+echo-agent-cypher	cypher_logs	/app/logs
+echo-agent-scribe	scribe_logs	/app/logs
+echo-agent-sentinel	sentinel_logs	/app/logs
+telemetry	telemetry_logs	/app/logs
+snapshot-manager	snapshot_logs	/app/logs

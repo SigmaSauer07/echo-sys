@@ -1,0 +1,12 @@
+plugin: vscode_continue  
+runtime:  
+  requires:  
+    - vscode_fork  
+    - llm_bridge  
+  resources:  
+    cpu: 2  
+    memory_mb: 4096  
+compatibility:  
+  min_mcp_version: "2.4.0"  
+hooks:  
+  on_install: "plugins/vscode/setup.sh"  
