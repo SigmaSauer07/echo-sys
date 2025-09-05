@@ -136,8 +136,7 @@
         "DEFAULT_MINIMUM_TOKENS": ""
       },
       "type": "stdio"
-    }
-  },
+    },
   "mcpRelays": {
     "redis": {
       "command": "uvx",
