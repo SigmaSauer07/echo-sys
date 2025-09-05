@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-# echo-sys
-mcp and ai agent system 
-=======
 # Alsania MCP Hybrid System Documentation
 
 ## Overview
@@ -101,5 +97,4 @@ curl -X POST http://127.0.0.1:9001/remote -H 'Content-Type: application/json' -d
 
 ## Contact & Support
 For questions or contributions, see the project README or contact the maintainer.
->>>>>>> 0e71de3 (Auto-commit: 224 added, 1 modified files)
 # echo-sys
