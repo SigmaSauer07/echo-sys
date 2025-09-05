@@ -39,14 +39,6 @@
       "args": ["markitdown-mcp"],
       "type": "stdio"
     },
-    "codacy": {
-      "command": "npx",
-      "args": ["-y", "@codacy/codacy-mcp@latest"],
-      "env": {
-        "CODACY_ACCOUNT_TOKEN": "UHWmca0O5cIBYKjB4Cbe"
-      },
-      "type": "stdio"
-    },
     "imagesorcery": {
       "command": "uvx",
       "args": ["imagesorcery-mcp"],
@@ -134,14 +126,6 @@
         "--viewport-size="
       ],
       "type": "stdio"
-    },
-    "slack": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-slack"],
-      "env": {
-        "SLACK_BOT_TOKEN": "xoxb-9408484691204-9438594162354-8VHjtOlCCLT3xZouScX9iWgf",
-        "SLACK_TEAM_ID": "T09C0E8LB60",
-        "SLACK_CHANNEL_IDS": "C09C0E8QK3N"
       },
       "type": "stdio"
     },
